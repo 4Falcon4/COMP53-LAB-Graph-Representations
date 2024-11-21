@@ -36,19 +36,17 @@ public:
    // already exists in the graph, no change is made and false is returned.
    // Otherwise the new edge is added and true is returned.
    virtual bool AddDirectedEdge(Vertex* fromVertex, Vertex* toVertex) override {
+       if (HasEdge(fromVertex, toVertex))
+       {
+           return false;
+       }
+
        for (int i = 0; i < vertices.size(); i++)
        {
            if (vertices[i] == fromVertex) 
            {
-               if (HasEdge(fromVertex, toVertex)) 
-               {
-                   return false;
-               }
-               else 
-               {
-                   vertices[i]->adjacent.push_back(toVertex);
-                   return true;
-               }
+                vertices[i]->adjacent.push_back(toVertex);
+                return true;
            }
        }
       return false;
@@ -64,7 +62,7 @@ public:
                edges.push_back(Edge(fromVertex, vertices[i]));
            }
        }
-      return std::vector<Edge>();
+      return edges;
    }
     
    // Returns a vector of edges with the specified toVertex.
@@ -95,12 +93,17 @@ public:
    // Returns true if this graph has an edge from fromVertex to toVertex
    virtual bool HasEdge(Vertex* fromVertex, Vertex* toVertex) override {
        for (int i = 0; i < vertices.size(); i++) {
-            if (vertices[i] == fromVertex) {
+            if (vertices[i]->GetLabel() == fromVertex->GetLabel()) {
+                if (vertices[i]->adjacent.size() == 0)
+                {
+                    return false;
+                }
                 for (int j = 0; j < vertices[i]->adjacent.size(); j++) {
-                    if (vertices[i]->adjacent[j] == toVertex) {
+                    if (vertices[i]->adjacent[j]->GetLabel() == toVertex->GetLabel()) {
                         return true;
                     }
                 }
+                return false;
            }
        }
       return false;
