@@ -16,7 +16,7 @@ protected:
 public:    
    virtual ~AdjacencyMatrixGraph() {
       for (Vertex* vertex : vertices) {
-         delete vertex;
+         //delete vertex;
       }
    }
 
@@ -29,9 +29,13 @@ public:
                return nullptr;
            }
        }
-
        vertices.push_back(new Vertex(newVertexLabel));
        Vertex* newVertex = new Vertex(newVertexLabel);
+
+       matrixRows.push_back(std::vector<bool>(vertices.size(), false));
+       for (int i = 0; i < vertices.size(); i++) {
+           matrixRows[i].push_back(false);
+       }
 
        return newVertex;
    }
@@ -49,8 +53,14 @@ public:
        {
            if (vertices[i] == fromVertex)
            {
-               vertices[i]->adjacent.push_back(toVertex);
-               return true;
+               for (int j = 0; j < vertices.size(); j++) 
+               {
+                   if (vertices[j] == toVertex)
+                   {
+                       matrixRows[i][j] = true;
+                       return true;
+                   }
+               }
            }
        }
        return false;
@@ -58,14 +68,28 @@ public:
     
    // Returns a vector of edges with the specified fromVertex.
    virtual std::vector<Edge> GetEdgesFrom(Vertex* fromVertex) override {
-      // Your code here (remove placeholder line below)
-      return std::vector<Edge>();
+       std::vector<Edge> edges;
+       for (int i = 0; i < vertices.size(); i++)
+       {
+           if (HasEdge(fromVertex, vertices[i]))
+           {
+               edges.push_back(Edge(fromVertex, vertices[i]));
+           }
+       }
+       return edges;
    }
     
    // Returns a vector of edges with the specified toVertex.
    virtual std::vector<Edge> GetEdgesTo(Vertex* toVertex) override {
-      // Your code here (remove placeholder line below)
-      return std::vector<Edge>();
+       std::vector<Edge> edges;
+       for (int i = 0; i < vertices.size(); i++)
+       {
+           if (HasEdge(vertices[i], toVertex))
+           {
+               edges.push_back(Edge(vertices[i], toVertex));
+           }
+       }
+       return edges;
    }
     
    // Returns a vertex with a matching label, or nullptr if no such vertex
@@ -82,8 +106,23 @@ public:
     
    // Returns true if this graph has an edge from fromVertex to toVertex
    virtual bool HasEdge(Vertex* fromVertex, Vertex* toVertex) override {
-      // Your code here (remove placeholder line below)
-      return false;
+       for (int i = 0; i < vertices.size(); i++)
+       {
+           if (vertices[i] == fromVertex)
+           {
+               for (int j = 0; j < vertices.size(); j++)
+               {
+                   if (vertices[j] == toVertex)
+                   {
+                       if (matrixRows[i][j] == true)
+                       {
+                           return true;
+                       }
+                   }
+               }
+           }
+       }
+       return false;
    }
 };
 
